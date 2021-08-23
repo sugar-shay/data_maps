@@ -8,7 +8,7 @@ Created on Fri Aug 20 10:45:34 2021
 
 from datasets import load_dataset
 
-train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:5500]', 'validation','test'])
+train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:25000]', 'validation','test'])
 
 train_labels = train_ds['label']
 val_labels = val_ds['label']
