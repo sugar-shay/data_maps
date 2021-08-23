@@ -134,10 +134,11 @@ class LIT_SNLI(pl.LightningModule):
         # Outputs --> List of Individual Step Outputs
         avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
         
-        if len(self.val_losses) == 0 or avg_loss<np.min(self.val_losses):
+        avg_loss_cpu = avg_loss.detach().cpu().numpy()
+        if len(self.val_losses) == 0 or avg_loss_cpu<np.min(self.val_losses):
             self.save_model()
             
-        self.val_losses.append(avg_loss)
+        self.val_losses.append(avg_loss_cpu)
         
         avg_acc =  np.stack([x["val_acc"] for x in outputs]).mean()
         self.val_accs.append(avg_acc)
