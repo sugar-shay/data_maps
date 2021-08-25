@@ -44,9 +44,9 @@ tokenizer = AutoTokenizer.from_pretrained(encoder_name)
 
 MAX_LEN = 64
 
-train_token = tokenizer(train_text, max_length = MAX_LEN, pad_to_max_length = True, truncation = True)
-val_token = tokenizer(val_text, max_length=MAX_LEN, pad_to_max_length=True, truncation = True)
-test_token = tokenizer(test_text, max_length = MAX_LEN, pad_to_max_length = True, truncation = True)
+train_token = tokenizer(train_text, padding=MAX_LEN, truncation = True)
+val_token = tokenizer(val_text, padding=MAX_LEN, truncation = True)
+test_token = tokenizer(test_text, padding=MAX_LEN, truncation = True)
 
 
 
@@ -75,8 +75,8 @@ from lit_snli import *
 
 #train_data = TensorDataset({'input_ides': train_seq, 'attention_mask': train_mask, 'labels':train_y})
 #train_dataloader = DataLoader(train_data, shuffle=False, batch_size=batch_size)
-test_enc = {'input_ids': train_seq, 'attention_mask': train_mask} 
-train_data = SNLI_Dataset(test_enc, train_y)
+train_enc = {'input_ids': train_seq, 'attention_mask': train_mask} 
+train_data = SNLI_Dataset(train_enc, train_y)
 
 
 #val_data = TensorDataset({'input_ides': val_seq, 'attention_mask': val_mask, 'labels':val_y})
