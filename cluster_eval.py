@@ -111,6 +111,9 @@ train_data_hard = SNLI_Dataset(train_enc_hard, train_y_hard)
 val_enc = {'input_ids': val_seq, 'attention_mask': val_mask} 
 val_data = SNLI_Dataset(val_enc, val_y)
 
+test_enc = {'input_ids':test_seq, 'attention_mask':test_mask}
+test_data = SNLI_Dataset(test_enc, test_y)
+
 if not os.path.exists('cluster2d_models'):
     os.makedirs('cluster2d_models')
     
@@ -125,6 +128,20 @@ print()
 model_hard = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'cluster2d_models/bert_hard2d_train.pt')
 model_hard = train_LitModel(model_hard, train_data_hard, val_data, max_epochs=10, batch_size=32, patience = 5, num_gpu=1)
 print()
+
+model_easy = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
+model_easy.load_state_dict(torch.load('cluster2d_models/bert_easy2d_train.pt'))
+easy_cr = model_testing(model_easy, test_data)
+
+model_ambig = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
+model_ambig.load_state_dict(torch.load('cluster2d_models/bert_ambig2d_train.pt'))
+ambig_cr = model_testing(model_ambig, test_data)
+
+
+model_hard = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
+model_hard.load_state_dict(torch.load('cluster2d_models/bert_hard2d_train.pt'))
+hard_cr = model_testing(model_hard, test_data)
+
 
 if not os.path.exists('cluster2d_files'):
     os.makedirs('cluster2d_files')
@@ -144,6 +161,7 @@ hard_files = {'train_losses': model_hard.train_losses,
               'train_accs': model_hard.train_accs,
               'val_accs': model_hard.val_accs}
 
+#saving training statistics
 with open('cluster2d_files/easy_files.pkl', 'wb') as f:
     pickle.dump(easy_files, f)
     
@@ -151,5 +169,15 @@ with open('cluster2d_files/ambig_files.pkl', 'wb') as f:
     pickle.dump(ambig_files, f)
 
 with open('cluster2d_files/hard_files.pkl', 'wb') as f:
+    pickle.dump(hard_files, f)
+
+#saving testing statistics 
+with open('cluster2d_files/easy_test_stats.pkl', 'wb') as f:
+    pickle.dump(easy_files, f)
+    
+with open('cluster2d_files/ambig_test_stats.pkl', 'wb') as f:
+    pickle.dump(ambig_files, f)
+
+with open('cluster2d_files/hard_test_stats.pkl', 'wb') as f:
     pickle.dump(hard_files, f)
     
