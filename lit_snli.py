@@ -201,7 +201,7 @@ def model_testing(model, test_dataset):
         predictions = predictions.detach().cpu().numpy()
         
         preds.extend(predictions)
-        total_labels.extned(labels)
+        total_labels.extend(labels)
         
     cr = classification_report(total_labels, preds, output_dict=True)
     return cr
