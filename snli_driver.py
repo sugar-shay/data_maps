@@ -99,12 +99,12 @@ if not os.path.exists('numpy_files'):
     
 #Saving train statistics
 
-train_statistics = {'gt_probs': gt_probs,
-                    'correctness':correctness,
-                    'train_losses':train_losses,
-                    'val_losses':val_losses,
-                    'train_accs':train_accs,
-                    'val_accs':val_accs}
+train_statistics = {'gt_probs': model.gt_probs,
+                    'correctness':model.correctness,
+                    'train_losses':model.train_losses,
+                    'val_losses':model.val_losses,
+                    'train_accs':model.train_accs,
+                    'val_accs':model.val_accs}
 
 import pickle
 
