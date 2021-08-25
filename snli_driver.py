@@ -73,19 +73,16 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 
 from lit_snli import *
 
-#train_data = TensorDataset({'input_ides': train_seq, 'attention_mask': train_mask, 'labels':train_y})
-#train_dataloader = DataLoader(train_data, shuffle=False, batch_size=batch_size)
+
 train_enc = {'input_ids': train_seq, 'attention_mask': train_mask} 
 train_data = SNLI_Dataset(train_enc, train_y)
 
-
-#val_data = TensorDataset({'input_ides': val_seq, 'attention_mask': val_mask, 'labels':val_y})
-#val_dataloader = DataLoader(val_data, shuffle=False, batch_size=batch_size)
 val_enc = {'input_ids': val_seq, 'attention_mask': val_mask} 
 val_data = SNLI_Dataset(val_enc, val_y)
 
-#test_data = TensorDataset(test_seq, test_mask, test_y)
-#test_dataloader = DataLoader(test_data, batch_size=batch_size)
+test_enc = {'input_ids': test_seq, 'attention_mask': test_mask} 
+test_data = SNLI_Dataset(test_enc, test_y)
+
 
 model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'bert_25k_train.pt')
 
@@ -100,18 +97,27 @@ import os
 if not os.path.exists('numpy_files'):
     os.makedirs('numpy_files')
     
-#Saving epoch statistics
-np.save('numpy_files/gt_probs', gt_probs, allow_pickle=True)
-np.save('numpy_files/correctness', correctness, allow_pickle=True)
+#Saving train statistics
 
-#Saving losses
-np.save('numpy_files/train_losses', model.train_losses, allow_pickle=True)
-np.save('numpy_files/val_losses', model.val_losses, allow_pickle=True)
+train_statistics = {'gt_probs': gt_probs,
+                    'correctness':correctness,
+                    'train_losses':train_losses,
+                    'val_losses':val_losses,
+                    'train_accs':train_accs,
+                    'val_accs':val_accs}
 
-#Saving accs
-np.save('numpy_files/train_accs', model.train_accs, allow_pickle=True)
-np.save('numpy_files/val_accs', model.val_accs, allow_pickle=True)
+import pickle
 
-#torch.save(model.state_dict(), 'roberta_full_train.pt')
+with open('numpy_files/bert_25k_train_stats.pkl', 'wb') as f:
+    pickle.dump(train_statistics, f)
 
+#reloading the model for testing
+model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
+
+model.load_state_dict(torch.load('bert_25k_train.pt'))
+
+cr = model_testing(model, test_data)
+
+with open('numpy_files/bert_25k_test_stats.pkl', 'wb') as f:
+    pickle.dump(cr, f)
 

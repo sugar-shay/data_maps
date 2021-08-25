@@ -15,7 +15,7 @@ from transformers import AutoModelForSequenceClassification, AutoConfig
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from pytorch_lightning.loggers import WandbLogger
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 from pytorch_lightning.callbacks import ModelCheckpoint
 import os 
 
@@ -147,6 +147,7 @@ class LIT_SNLI(pl.LightningModule):
         
         
 
+
 def train_LitModel(model, train_data, val_data, max_epochs, batch_size, patience = 5, num_gpu=1):
     
     #
@@ -173,6 +174,38 @@ def train_LitModel(model, train_data, val_data, max_epochs, batch_size, patience
 
     return model
 
+
+def model_testing(model, test_dataset):
+    
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    
+    model = model.to(device)
+    
+    test_dataloader = DataLoader(test_dataset, batch_size=32)
+    
+    preds, total_labels = [], []
+    
+    model.eval()
+    for idx, batch in enumerate(test_dataloader):
+        
+        seq = (batch['input_ids']).to(device)
+        mask = (batch['attention_mask']).to(device)
+        labels = batch['labels']
+        
+        outputs = model(input_ids=seq, attention_mask=mask, labels=None)
+        
+        logits = outputs.logits
+        logits = torch.nn.functional.softmax(logits, dim=-1)
+        
+        predictions = torch.argmax(logits, dim=-1)
+        predictions = predictions.detach().cpu().numpy()
+        
+        preds.extend(predictions)
+        total_labels.extned(labels)
+        
+    cr = classification_report(total_labels, preds, output_dict=True)
+    return cr
+        
 
 class SNLI_Dataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
