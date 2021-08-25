@@ -44,9 +44,9 @@ tokenizer = AutoTokenizer.from_pretrained(encoder_name)
 
 MAX_LEN = 64
 
-train_token = tokenizer(train_text, padding=MAX_LEN, truncation = True)
-val_token = tokenizer(val_text, padding=MAX_LEN, truncation = True)
-test_token = tokenizer(test_text, padding=MAX_LEN, truncation = True)
+train_token = tokenizer(train_text, max_length = MAX_LEN, pad_to_max_length=True, truncation = True)
+val_token = tokenizer(val_text,max_length = MAX_LEN, pad_to_max_length=True, truncation = True)
+test_token = tokenizer(test_text, max_length = MAX_LEN, pad_to_max_length=True, truncation = True)
 
 
 
