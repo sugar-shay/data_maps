@@ -84,14 +84,14 @@ def main():
     test_data = SNLI_Dataset(test_enc, test_y)
     
     
-    model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'bert_25k_small_batch.pt')
+    model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name, save_fp = 'bert_25k_small_drop.pt')
     
     model = train_LitModel(model, train_data, val_data, max_epochs=6, batch_size=4, patience = 5, num_gpu=1)
     
     
     
-    if not os.path.exists('bert_25k_small_batch'):
-        os.makedirs('bert_25k_small_batch')
+    if not os.path.exists('bert_25k_small_drop'):
+        os.makedirs('bert_25k_small_drop')
         
     #Saving train statistics
     
@@ -103,17 +103,17 @@ def main():
                         'val_accs':model.val_accs}
 
     
-    with open('bert_25k_small_batch/bert_25k_train_stats.pkl', 'wb') as f:
+    with open('bert_25k_small_drop/bert_25k_train_stats.pkl', 'wb') as f:
         pickle.dump(train_statistics, f)
     
     #reloading the model for testing
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
     
-    model.load_state_dict(torch.load('bert_25k_small_batch.pt'))
+    model.load_state_dict(torch.load('bert_25k_small_drop.pt'))
     
     cr = model_testing(model, test_data)
     
-    with open('bert_25k_small_batch/bert_25k_test_stats.pkl', 'wb') as f:
+    with open('bert_25k_small_drop/bert_25k_test_stats.pkl', 'wb') as f:
         pickle.dump(cr, f)
     
 if __name__ == "__main__":
