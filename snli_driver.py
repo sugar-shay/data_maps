@@ -86,8 +86,7 @@ test_data = SNLI_Dataset(test_enc, test_y)
 
 model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'bert_25k_small_batch.pt')
 
-model = train_LitModel(model, train_data, val_data, max_epochs=6, batch_size=4, patience = 5, num_gpu=1)
-
+model = train_LitModel(model, train_data, val_data, max_epochs=6, batch_size=4, patience = 5, num_gpu=2)
 
 gt_probs = model.gt_probs
 correctness = model.correctness
@@ -114,7 +113,7 @@ with open('bert_25k_small_batch/bert_25k_train_stats.pkl', 'wb') as f:
 #reloading the model for testing
 model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
 
-model.load_state_dict(torch.load('bert_25k_train.pt'))
+model.load_state_dict(torch.load('bert_25k_small_batch.pt'))
 
 cr = model_testing(model, test_data)
 
