@@ -84,9 +84,9 @@ test_enc = {'input_ids': test_seq, 'attention_mask': test_mask}
 test_data = SNLI_Dataset(test_enc, test_y)
 
 
-model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'bert_25k_train.pt')
+model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'bert_25k_small_batch.pt')
 
-model = train_LitModel(model, train_data, val_data, max_epochs=6, batch_size=32, patience = 5, num_gpu=1)
+model = train_LitModel(model, train_data, val_data, max_epochs=6, batch_size=4, patience = 5, num_gpu=1)
 
 
 gt_probs = model.gt_probs
@@ -94,8 +94,8 @@ correctness = model.correctness
 
 import os 
 
-if not os.path.exists('numpy_files'):
-    os.makedirs('numpy_files')
+if not os.path.exists('bert_25k_small_batch'):
+    os.makedirs('bert_25k_small_batch')
     
 #Saving train statistics
 
@@ -108,7 +108,7 @@ train_statistics = {'gt_probs': model.gt_probs,
 
 import pickle
 
-with open('numpy_files/bert_25k_train_stats.pkl', 'wb') as f:
+with open('bert_25k_small_batch/bert_25k_train_stats.pkl', 'wb') as f:
     pickle.dump(train_statistics, f)
 
 #reloading the model for testing
@@ -118,6 +118,6 @@ model.load_state_dict(torch.load('bert_25k_train.pt'))
 
 cr = model_testing(model, test_data)
 
-with open('numpy_files/bert_25k_test_stats.pkl', 'wb') as f:
+with open('bert_25k_small_batch/bert_25k_test_stats.pkl', 'wb') as f:
     pickle.dump(cr, f)
 
