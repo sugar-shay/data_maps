@@ -86,10 +86,8 @@ def main():
     
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'bert_25k_small_batch.pt')
     
-    model = train_LitModel(model, train_data, val_data, max_epochs=6, batch_size=4, patience = 5, num_gpu=2)
+    model = train_LitModel(model, train_data, val_data, max_epochs=6, batch_size=4, patience = 5, num_gpu=1)
     
-    gt_probs = model.gt_probs
-    correctness = model.correctness
     
     
     if not os.path.exists('bert_25k_small_batch'):
