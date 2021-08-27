@@ -101,6 +101,9 @@ class LIT_SNLI(pl.LightningModule):
         avg_loss = torch.stack([x["train_loss"] for x in outputs]).mean()
         self.train_losses.append(avg_loss.detach().cpu())
         
+        #could do 
+        #self.train_losses.append((avg_loss.detach().cpu()), self.current_epoch)
+        
         avg_acc = np.stack([x["train_acc"] for x in outputs]).mean()
         self.train_accs.append(avg_acc)
         
