@@ -123,15 +123,15 @@ if not os.path.exists('cluster2d_models'):
     os.makedirs('cluster2d_models')
     
 model_easy = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'cluster2d_models/bert_easy2d_train.pt')
-model_easy = train_LitModel(model_easy, train_data_easy, val_data, max_epochs=10, batch_size=4, patience = 3, num_gpu=1)
+model_easy = train_LitModel(model_easy, train_data_easy, val_data, max_epochs=10, batch_size=8, patience = 3, num_gpu=1)
 print()
 
 model_ambig = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'cluster2d_models/bert_ambig2d_train.pt')
-model_ambig = train_LitModel(model_ambig, train_data_ambig, val_data, max_epochs=10, batch_size=4, patience = 3, num_gpu=1)
+model_ambig = train_LitModel(model_ambig, train_data_ambig, val_data, max_epochs=10, batch_size=8, patience = 3, num_gpu=1)
 print()
 
 model_hard = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'cluster2d_models/bert_hard2d_train.pt')
-model_hard = train_LitModel(model_hard, train_data_hard, val_data, max_epochs=10, batch_size=4, patience = 3, num_gpu=1)
+model_hard = train_LitModel(model_hard, train_data_hard, val_data, max_epochs=10, batch_size=8, patience = 3, num_gpu=1)
 print()
 
 model_easy = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
