@@ -114,7 +114,7 @@ class LIT_SNLI(pl.LightningModule):
         self.gt_probs.append(gt_probs.detach().cpu().numpy())
         self.correctness.append(correctness.detach().cpu().numpy())
         
-        print('Train Loss: ', avg_loss)
+        #print('Train Loss: ', avg_loss)
         
     def validation_step(self, batch, batch_idx):
 
@@ -148,7 +148,7 @@ class LIT_SNLI(pl.LightningModule):
         
         #self.log('val_loss', avg_loss, self.current_epoch)
         
-        print('Val Loss: ', avg_loss)
+        #print('Val Loss: ', avg_loss)
         
         
 
