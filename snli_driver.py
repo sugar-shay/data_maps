@@ -19,7 +19,7 @@ from lit_snli import *
 
 def main():
     
-    train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:25000]', 'validation','test'])
+    train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:3000]', 'validation','test'])
     
     train_labels = train_ds['label']
     val_labels = val_ds['label']
@@ -84,14 +84,14 @@ def main():
     test_data = SNLI_Dataset(test_enc, test_y)
     
     
-    model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name, save_fp = 'bert_25k_small_drop.pt')
+    model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name, save_fp = 'bert_test.pt')
     
-    model = train_LitModel(model, train_data, val_data, max_epochs=6, batch_size=4, patience = 5, num_gpu=1)
+    model = train_LitModel(model, train_data, val_data, max_epochs=15, batch_size=4, patience = 3, num_gpu=1)
     
     
     
-    if not os.path.exists('bert_25k_small_drop'):
-        os.makedirs('bert_25k_small_drop')
+    if not os.path.exists('bert_test'):
+        os.makedirs('bert_test')
         
     #Saving train statistics
     
@@ -103,17 +103,17 @@ def main():
                         'val_accs':model.val_accs}
 
     
-    with open('bert_25k_small_drop/bert_25k_train_stats.pkl', 'wb') as f:
+    with open('bert_test/bert_train_stats.pkl', 'wb') as f:
         pickle.dump(train_statistics, f)
     
     #reloading the model for testing
-    model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
+    model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name)
     
-    model.load_state_dict(torch.load('bert_25k_small_drop.pt'))
+    model.load_state_dict(torch.load('bert_test.pt'))
     
     cr = model_testing(model, test_data)
     
-    with open('bert_25k_small_drop/bert_25k_test_stats.pkl', 'wb') as f:
+    with open('bert_test/bert_test_stats.pkl', 'wb') as f:
         pickle.dump(cr, f)
     
 if __name__ == "__main__":

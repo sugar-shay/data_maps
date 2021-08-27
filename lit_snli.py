@@ -16,7 +16,7 @@ from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from pytorch_lightning.loggers import WandbLogger
 from sklearn.metrics import accuracy_score, classification_report
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import EarlyStopping
 import os 
 
 class LIT_SNLI(pl.LightningModule):
@@ -143,30 +143,22 @@ class LIT_SNLI(pl.LightningModule):
         avg_acc =  np.stack([x["val_acc"] for x in outputs]).mean()
         self.val_accs.append(avg_acc)
         
+        self.log('val_loss', avg_loss, self.current_epoch)
+        
         print('Val Loss: ', avg_loss)
         
         
 
 
-def train_LitModel(model, train_data, val_data, max_epochs, batch_size, patience = 5, num_gpu=1):
+def train_LitModel(model, train_data, val_data, max_epochs, batch_size, patience = 3, num_gpu=1):
     
     #
     train_dataloader = DataLoader(train_data, batch_size = batch_size, shuffle=False)#, num_workers=8)#, num_workers=16)
     val_dataloader = DataLoader(val_data, batch_size=32, shuffle = False)
     
+    early_stop_callback = EarlyStopping(monitor="val_loss", patience=patience, verbose=False, mode="min")
     
-    '''
-    if not os.path.exists('saved_models'):
-       os.makedirs('saved_models')
-    '''
-    
-    checkpoint_callback = ModelCheckpoint(monitor="val_loss",
-        dirpath=os.getcwd(),
-        filename='best_model.ckpt',
-        save_top_k=1,
-        mode="min")
-    
-    trainer = pl.Trainer(gpus=num_gpu, max_epochs = max_epochs, callbacks = [checkpoint_callback])
+    trainer = pl.Trainer(gpus=num_gpu, max_epochs = max_epochs, callbacks = [early_stop_callback])
     trainer.fit(model, train_dataloader, val_dataloader)
     
     model.gt_probs, model.correctness = (np.array(model.gt_probs)).T, (np.array(model.correctness)).T

@@ -43,6 +43,11 @@ directory ='bert_25k_files'
 train_df = pd.DataFrame({'text':train_text,
                          'labels':train_labels})
 
+'''
+with open(directory+'/'+'cluster_region2d.pkl', 'rb') as f:
+    cluster2d_regions = pickle.load(f)
+'''
+
 with open('cluster_region2d.pkl', 'rb') as f:
     cluster2d_regions = pickle.load(f)
 
@@ -118,15 +123,15 @@ if not os.path.exists('cluster2d_models'):
     os.makedirs('cluster2d_models')
     
 model_easy = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'cluster2d_models/bert_easy2d_train.pt')
-model_easy = train_LitModel(model_easy, train_data_easy, val_data, max_epochs=10, batch_size=32, patience = 5, num_gpu=1)
+model_easy = train_LitModel(model_easy, train_data_easy, val_data, max_epochs=10, batch_size=4, patience = 3, num_gpu=1)
 print()
 
 model_ambig = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'cluster2d_models/bert_ambig2d_train.pt')
-model_ambig = train_LitModel(model_ambig, train_data_ambig, val_data, max_epochs=10, batch_size=32, patience = 5, num_gpu=1)
+model_ambig = train_LitModel(model_ambig, train_data_ambig, val_data, max_epochs=10, batch_size=4, patience = 3, num_gpu=1)
 print()
 
 model_hard = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name, save_fp = 'cluster2d_models/bert_hard2d_train.pt')
-model_hard = train_LitModel(model_hard, train_data_hard, val_data, max_epochs=10, batch_size=32, patience = 5, num_gpu=1)
+model_hard = train_LitModel(model_hard, train_data_hard, val_data, max_epochs=10, batch_size=4, patience = 3, num_gpu=1)
 print()
 
 model_easy = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
@@ -149,17 +154,20 @@ if not os.path.exists('cluster2d_files'):
 easy_files = {'train_losses': model_easy.train_losses, 
               'val_losses':model_easy.val_losses, 
               'train_accs': model_easy.train_accs,
-              'val_accs': model_easy.val_accs}
+              'val_accs': model_easy.val_accs,
+              'cr': easy_cr}
 
 ambig_files = {'train_losses': model_ambig.train_losses, 
               'val_losses':model_ambig.val_losses, 
               'train_accs': model_ambig.train_accs,
-              'val_accs': model_ambig.val_accs}
+              'val_accs': model_ambig.val_accs,
+              'cr': ambig_cr}
 
 hard_files = {'train_losses': model_hard.train_losses, 
               'val_losses':model_hard.val_losses, 
               'train_accs': model_hard.train_accs,
-              'val_accs': model_hard.val_accs}
+              'val_accs': model_hard.val_accs,
+              'cr': hard_cr}
 
 #saving training statistics
 with open('cluster2d_files/easy_files.pkl', 'wb') as f:
