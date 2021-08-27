@@ -19,7 +19,7 @@ from transformers import AutoTokenizer
 
 from lit_snli import *
 
-def main():
+def main(cluster_eval=True):
     
     total_train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:25000]', 'validation','test'])
         
@@ -48,6 +48,7 @@ def main():
     val_text, val_labels = filter_unlabeled(val_text, val_labels)
     test_text, test_labels = filter_unlabeled(test_text, test_labels)
     
+    
     #our oracle batch and init train size will be 1% of the data
     #percent_train = .01
     #init_train_size = np.floor(percent_train*len(total_train_text))
@@ -59,6 +60,18 @@ def main():
     
     unlabled_df = pd.DataFrame({'text':total_train_text,
                                 'labels':total_train_labels})
+    
+    if cluster_eval == True:
+        with open('cluster_region2d.pkl', 'rb') as f:
+            cluster2d_regions = pickle.load(f)
+
+        easy_region = cluster2d_regions['easy']
+        easy_mask = easy_region.index.values
+        easy_data = unlabled_df.iloc[easy_mask, :]
+        
+        unlabled_df = easy_data
+        
+        print('The number of samples in the cluster: ', len(unlabled_df))
     
     init_train = unlabled_df.sample(n=init_train_size, replace = False, random_state = 0)
     
@@ -142,7 +155,7 @@ def main():
                              'macro_prec':macro_prec,
                              'macro_recall':macro_recall}    
     
-    with open(save_dir+'/active_learning_stats.pkl', 'wb') as f:
+    with open(save_dir+'/active_learning_easy_stats.pkl', 'wb') as f:
             pickle.dump(active_learning_stats, f)
             
             
