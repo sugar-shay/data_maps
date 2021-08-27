@@ -20,7 +20,7 @@ from transformers import AutoTokenizer
 from lit_snli import *
 
 
-total_train_ds, val_ds, test_ds = load_dataset('snli', split=['train[25000]', 'validation','test'])
+total_train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:25000]', 'validation','test'])
     
 total_train_labels = total_train_ds['label']
 val_labels = val_ds['label']
