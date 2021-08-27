@@ -71,8 +71,10 @@ def main(cluster_eval=True):
         easy_data = unlabled_df.iloc[easy_mask, :]
         
         unlabled_df = easy_data
-        
-        print('The number of samples in the cluster: ', len(unlabled_df))
+    
+    print()
+    print('The size of the unlabeled pool: ', len(unlabled_df))
+    print()
     
     init_train = unlabled_df.sample(n=init_train_size, replace = False, random_state = 0)
     
@@ -151,14 +153,17 @@ def main(cluster_eval=True):
         
         init_train = pd.concat([init_train, oracle_samples], ignore_index=True)
     
+    print('Sanity Check # Accs: ', len(accs))
     active_learning_stats = {'accs':accs,
                              'macro_f1':macro_f1,
                              'macro_prec':macro_prec,
-                             'macro_recall':macro_recall}    
+                             'macro_recall':macro_recall}
+
+    print     
     
     with open(save_dir+'/active_learning_easy_stats.pkl', 'wb') as f:
             pickle.dump(active_learning_stats, f)
             
             
 if __name__=="__main__":
-    main()
+    main(cluster_eval=(False))
