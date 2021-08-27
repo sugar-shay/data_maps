@@ -110,7 +110,7 @@ for step in range(active_learning_iterations):
     
     
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name, save_fp = save_dir+'/'+save_file+'.pt')
-    model = train_LitModel(model, train_data, val_data, max_epochs=10, batch_size=4, patience = 3, num_gpu=4)
+    model = train_LitModel(model, train_data, val_data, max_epochs=10, batch_size=4, patience = 3, num_gpu=1)
     
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.3, attention_probs_dropout_prob=.2, encoder_name=encoder_name)
     model.load_state_dict(torch.load(save_dir+'/'+save_file+'.pt'))
