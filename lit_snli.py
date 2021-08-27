@@ -143,7 +143,7 @@ class LIT_SNLI(pl.LightningModule):
         avg_acc =  np.stack([x["val_acc"] for x in outputs]).mean()
         self.val_accs.append(avg_acc)
         
-        self.log('val_loss', avg_loss, self.current_epoch)
+        #self.log('val_loss', avg_loss, self.current_epoch)
         
         print('Val Loss: ', avg_loss)
         
@@ -156,9 +156,9 @@ def train_LitModel(model, train_data, val_data, max_epochs, batch_size, patience
     train_dataloader = DataLoader(train_data, batch_size = batch_size, shuffle=False)#, num_workers=8)#, num_workers=16)
     val_dataloader = DataLoader(val_data, batch_size=32, shuffle = False)
     
-    early_stop_callback = EarlyStopping(monitor="val_loss", patience=patience, verbose=False, mode="min")
+    #early_stop_callback = EarlyStopping(monitor="val_loss", patience=patience, verbose=False, mode="min")
     
-    trainer = pl.Trainer(gpus=num_gpu, max_epochs = max_epochs, callbacks = [early_stop_callback])
+    trainer = pl.Trainer(gpus=num_gpu, max_epochs = max_epochs)
     trainer.fit(model, train_dataloader, val_dataloader)
     
     model.gt_probs, model.correctness = (np.array(model.gt_probs)).T, (np.array(model.correctness)).T
