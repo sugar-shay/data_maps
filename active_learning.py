@@ -161,9 +161,9 @@ def main(cluster_eval=True):
 
     print     
     
-    with open(save_dir+'/active_learning_easy_stats.pkl', 'wb') as f:
+    with open(save_dir+'/active_learning_stats.pkl', 'wb') as f:
             pickle.dump(active_learning_stats, f)
             
             
 if __name__=="__main__":
-    main(cluster_eval=(False))
+    main(cluster_eval=False)
