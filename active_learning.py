@@ -26,7 +26,7 @@ total_train_labels = total_train_ds['label']
 val_labels = val_ds['label']
 test_labels = test_ds['label']
 
-total_train_text = [i + ' ' + j for i, j in zip(train_ds['premise'],train_ds['hypothesis'])]
+total_train_text = [i + ' ' + j for i, j in zip(total_train_ds['premise'],total_train_ds['hypothesis'])]
 val_text = [i + ' ' + j for i, j in zip(val_ds['premise'], val_ds['hypothesis'])]
 test_text = [i + ' ' + j for i, j in zip(test_ds['premise'],test_ds['hypothesis'])]
 
@@ -73,7 +73,7 @@ save_dir = 'active_learning_files'
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
-for step in active_learning_iterations:
+for step in range(active_learning_iterations):
     
     train_token = tokenizer(init_train['text'].tolist(), max_length = MAX_LEN, pad_to_max_length=True, truncation = True)
     val_token = tokenizer(val_text,max_length = MAX_LEN, pad_to_max_length=True, truncation = True)
