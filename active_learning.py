@@ -73,6 +73,10 @@ save_dir = 'active_learning_files'
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
+
+accs, macro_f1, macro_recall, macro_prec = [], [], [], []
+
+
 for step in range(active_learning_iterations):
     
     train_token = tokenizer(init_train['text'].tolist(), max_length = MAX_LEN, pad_to_max_length=True, truncation = True)
@@ -102,7 +106,7 @@ for step in range(active_learning_iterations):
     test_data = SNLI_Dataset(test_enc, test_y)
     
     #current_percent_train = str((step+1)*percent_train)
-    save_file = 'bert_'+len(init_train)
+    save_file = 'bert_'+str(len(init_train))
     
     
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name, save_fp = save_dir+'/'+save_file+'.pt')
@@ -112,17 +116,30 @@ for step in range(active_learning_iterations):
     model.load_state_dict(torch.load(save_dir+'/'+save_file+'.pt'))
     
     cr = model_testing(model, test_data)
+    
     print()
     print('Active Learning Iteration: ', step+1)
     print('Accuracy: ', cr['accuracy'])
     print()
     
+    macro_f1.append(cr['macro_avg']['f1-score'])
+    macro_prec.append(cr['macro_avg']['precision'])
+    macro_recall.append(cr['macro_avg']['recall'])
+    accs.append(cr['accuracy'])
     
+    '''
     with open(save_dir+'/'+save_file+'.pkl', 'wb') as f:
         pickle.dump(cr, f)
-    
+    '''
     #getting samples from oracle 
     oracle_samples = unlabled_df.sample(n=init_train_size, replace = False)
     
     init_train = pd.concat([init_train, oracle_samples], ignore_index=True)
-    
+
+active_learning_stats = {'accs':accs,
+                         'macro_f1':macro_f1,
+                         'macro_prec':macro_prec,
+                         'macro_recall':macro_recall}    
+
+with open(save_dir+'/active_learning_stats.pkl', 'wb') as f:
+        pickle.dump(active_learning_stats, f)
