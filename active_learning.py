@@ -66,11 +66,11 @@ def main(cluster_eval=True):
         with open('cluster_region2d.pkl', 'rb') as f:
             cluster2d_regions = pickle.load(f)
 
-        easy_region = cluster2d_regions['easy']
-        easy_mask = easy_region.index.values
-        easy_data = unlabled_df.iloc[easy_mask, :]
+        ambig_region = cluster2d_regions['ambig']
+        ambig_mask = ambig_region.index.values
+        ambig_data = unlabled_df.iloc[ambig_mask, :]
         
-        unlabled_df = easy_data
+        unlabled_df = ambig_data
     
     print()
     print('The size of the unlabeled pool: ', len(unlabled_df))
@@ -161,7 +161,7 @@ def main(cluster_eval=True):
 
     print     
     
-    with open(save_dir+'/active_learning_easy_stats.pkl', 'wb') as f:
+    with open(save_dir+'/active_learning_ambig_stats.pkl', 'wb') as f:
             pickle.dump(active_learning_stats, f)
             
             
