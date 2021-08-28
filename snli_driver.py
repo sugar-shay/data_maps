@@ -86,6 +86,12 @@ def main():
     
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name, save_fp = 'bert_test.pt')
     
+    cr = model_testing(model, test_data)
+    
+    with open('sanity_check_cr.pkl', 'wb') as f:
+        pickle.dump(cr, f)
+    
+    '''
     model = train_LitModel(model, train_data, val_data, max_epochs=15, batch_size=4, patience = 3, num_gpu=1)
     
     
@@ -115,6 +121,9 @@ def main():
     
     with open('bert_test/bert_test_stats.pkl', 'wb') as f:
         pickle.dump(cr, f)
+    
+    
+    '''
     
 if __name__ == "__main__":
     main()
