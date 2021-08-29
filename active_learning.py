@@ -68,7 +68,7 @@ def main(cluster_eval=True, cluster_type=None, save_dir = 'active_learning_files
 
         cluster_region = cluster2d_regions[cluster_type]
         mask = cluster_region.index.values
-        cluster_data = unlabled_df.iloc[_mask, :]
+        cluster_data = unlabled_df.iloc[mask, :]
         
         unlabled_df = cluster_data
     
