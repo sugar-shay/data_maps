@@ -78,7 +78,7 @@ def main(cluster_eval=True, cluster_type=None, save_dir = 'active_learning_files
     
     init_train = unlabled_df.sample(n=init_train_size, replace = False, random_state = 0)
     
-    active_learning_iterations = 5
+    active_learning_iterations = 15
     
     encoder_name = 'bert-base-uncased'
         
@@ -167,10 +167,15 @@ if __name__=="__main__":
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
         
-    runs = 2
+    runs = 3
     
     accs, f1, prec, recall = [], [], [], []
     for run in range(runs):
+        
+        print()
+        print('##############')
+        print('RUN #:',run+1)
+        print('##############')
         
         stats = main(cluster_eval=False, save_dir=save_dir)
         accs.append(stats['accs'])
@@ -184,5 +189,10 @@ if __name__=="__main__":
     avg_prec = np.mean(prec, axis=0)
     avg_recall = np.mean(recall, axis=0)
     
-    print('Making sure we our average stat has shape (active learning iter, 1): ', len(avg_accs))
+    avg_active_learning_stat = {'accs':avg_accs,
+                             'macro_f1':avg_f1,
+                             'macro_prec':avg_prec,
+                             'macro_recall':avg_recall}
     
+    with open(save_dir+'/active_learning_random_stats.pkl', 'wb') as f:
+            pickle.dump(avg_active_learning_stat, f)
