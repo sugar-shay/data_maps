@@ -20,7 +20,7 @@ from transformers import AutoTokenizer
 
 from lit_snli import *
 
-def main(cluster_eval=True):
+def main(cluster_eval=True, cluster_type=None, save_dir = 'active_learning_files'):
     
     total_train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:25000]', 'validation','test'])
         
@@ -66,11 +66,11 @@ def main(cluster_eval=True):
         with open('cluster_region2d.pkl', 'rb') as f:
             cluster2d_regions = pickle.load(f)
 
-        hard_region = cluster2d_regions['hard']
-        hard_mask = hard_region.index.values
-        hard_data = unlabled_df.iloc[hard_mask, :]
+        cluster_region = cluster2d_regions[cluster_type]
+        mask = cluster_region.index.values
+        cluster_data = unlabled_df.iloc[_mask, :]
         
-        unlabled_df = hard_data
+        unlabled_df = cluster_data
     
     print()
     print('The size of the unlabeled pool: ', len(unlabled_df))
@@ -78,7 +78,7 @@ def main(cluster_eval=True):
     
     init_train = unlabled_df.sample(n=init_train_size, replace = False, random_state = 0)
     
-    active_learning_iterations = 10
+    active_learning_iterations = 5
     
     encoder_name = 'bert-base-uncased'
         
@@ -86,10 +86,7 @@ def main(cluster_eval=True):
         
     MAX_LEN = 64
     
-    save_dir = 'active_learning_files'
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-    
+
     
     accs, macro_f1, macro_recall, macro_prec = [], [], [], []
     
@@ -127,7 +124,7 @@ def main(cluster_eval=True):
         
         
         model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name, save_fp = save_dir+'/bert_train.pt')
-        model = train_LitModel(model, train_data, val_data, max_epochs=10, batch_size=4, patience = 3, num_gpu=1)
+        model = train_LitModel(model, train_data, val_data, max_epochs=10, batch_size=4, patience = 2, num_gpu=1)
         
         model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name)
         model.load_state_dict(torch.load(save_dir+'/bert_train.pt'))
@@ -159,11 +156,33 @@ def main(cluster_eval=True):
                              'macro_prec':macro_prec,
                              'macro_recall':macro_recall}
 
-    print     
     
-    with open(save_dir+'/active_learning_hard_stats.pkl', 'wb') as f:
-            pickle.dump(active_learning_stats, f)
-            
+    return active_learning_stats
             
 if __name__=="__main__":
-    main(cluster_eval=True)
+    
+    
+    save_dir = 'active_learning_files'
+    
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+        
+    runs = 2
+    
+    accs, f1, prec, recall = [], [], [], []
+    for run in range(runs):
+        
+        stats = main(cluster_eval=False, save_dir=save_dir)
+        accs.append(stats['accs'])
+        f1.append(stats['macro_f1'])
+        prec.append(stats['macro_prec'])
+        recall.append(stats['macro_recall'])
+        
+    accs, f1, prec, recall = np.array(accs), np.array(f1), np.array(prec), np.array(recall)
+    avg_accs = np.mean(accs, axis=0)
+    avg_f1 = np.mean(f1, axis=0)
+    avg_prec = np.mean(prec, axis=0)
+    avg_recall = np.mean(recall, axis=0)
+    
+    print('Making sure we our average stat has shape (active learning iter, 1): ', len(avg_accs))
+    
