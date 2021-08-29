@@ -19,7 +19,7 @@ from lit_snli import *
 
 def main():
     
-    train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:5500]', 'validation','test'])
+    train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:3500]', 'validation','test'])
     
     train_labels = train_ds['label']
     val_labels = val_ds['label']
@@ -122,7 +122,11 @@ def main():
     #reloading the model for testing
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name)
     
-    model.load_state_dict(torch.load('bert_test.pt'))
+    if gpus == 1:
+        model.load_state_dict(torch.load('bert_test.pt'))
+    else:
+        model = torch.nn.DataParallel(model)
+        model.load_state_dict(torch.load('bert_test.pt'))
     
     cr = model_testing(model, test_data)
     
