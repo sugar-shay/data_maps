@@ -50,10 +50,13 @@ class LIT_SNLI(pl.LightningModule):
         self.encoder = AutoModelForSequenceClassification.from_pretrained(encoder_name, config=config)
         
     def save_model(self):
+        
+        '''
         print()
         print('Class Attributes: ', self.__dict__)
         print()
-        torch.save(self.model.state_dict(), self.save_fp)
+        '''
+        torch.save(self.state_dict(), self.save_fp)
         
     def forward(self, input_ids, attention_mask, labels=None):
         outputs = self.encoder(input_ids=input_ids, attention_mask=attention_mask, labels=labels, return_dict=True)
