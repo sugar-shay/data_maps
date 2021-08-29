@@ -86,6 +86,7 @@ def main():
     
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name, save_fp = 'bert_test.pt')
     
+    
     '''
     cr = model_testing(model, test_data)
     
@@ -93,15 +94,17 @@ def main():
         pickle.dump(cr, f)
     
     '''
-    model = train_LitModel(model, train_data, val_data, max_epochs=15, batch_size=4, patience = 3, num_gpu=1)
+    gpus = -1
+    model = train_LitModel(model, train_data, val_data, max_epochs=15, batch_size=4, patience = 3, num_gpu=gpus)
     
     
     
     if not os.path.exists('bert_test'):
         os.makedirs('bert_test')
-        
-    #Saving train statistics
+     
     '''
+    #Saving train statistics
+    
     train_statistics = {'gt_probs': model.gt_probs,
                         'correctness':model.correctness,
                         'train_losses':model.train_losses,
@@ -110,8 +113,11 @@ def main():
                         'val_accs':model.val_accs}
 
     '''
-    with open('bert_test/bert_train_stats.pkl', 'wb') as f:
-        pickle.dump(model.training_stats, f)
+    
+    #we can only save training statistics when using one GPU
+    if gpus == 1:
+        with open('bert_test/bert_train_stats.pkl', 'wb') as f:
+            pickle.dump(model.training_stats, f)
     
     #reloading the model for testing
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name)
