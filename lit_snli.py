@@ -167,7 +167,7 @@ def train_LitModel(model, train_data, val_data, max_epochs, batch_size, patience
     train_dataloader = DataLoader(train_data, batch_size = batch_size, shuffle=False)#, num_workers=8)#, num_workers=16)
     val_dataloader = DataLoader(val_data, batch_size=32, shuffle = False)
     
-    early_stop_callback = EarlyStopping(monitor="val_acc", patience=patience, verbose=False, mode="max")
+    early_stop_callback = EarlyStopping(monitor="val_loss", patience=patience, verbose=False, mode="min")
     
     trainer = pl.Trainer(gpus=num_gpu, max_epochs = max_epochs, callbacks = [early_stop_callback])
     trainer.fit(model, train_dataloader, val_dataloader)
