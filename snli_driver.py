@@ -101,7 +101,7 @@ def main():
         os.makedirs('bert_test')
         
     #Saving train statistics
-    
+    '''
     train_statistics = {'gt_probs': model.gt_probs,
                         'correctness':model.correctness,
                         'train_losses':model.train_losses,
@@ -109,9 +109,9 @@ def main():
                         'train_accs':model.train_accs,
                         'val_accs':model.val_accs}
 
-    
+    '''
     with open('bert_test/bert_train_stats.pkl', 'wb') as f:
-        pickle.dump(train_statistics, f)
+        pickle.dump(model.training_stats, f)
     
     #reloading the model for testing
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name)
