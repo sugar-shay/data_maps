@@ -166,8 +166,8 @@ def train_LitModel(model, train_data, val_data, max_epochs, batch_size, patience
     trainer = pl.Trainer(gpus=num_gpu, max_epochs = max_epochs, callbacks = [early_stop_callback])
     trainer.fit(model, train_dataloader, val_dataloader)
     
-    model.gt_probs, model.correctness = (np.array(model.gt_probs)).T, (np.array(model.correctness)).T
-    model.train_losses, model.val_losses = np.array(model.train_losses), np.array(model.val_losses)
+    model.training_stats['gt_probs'], model.training_stats['correctness'] = (np.array(model.training_stats['gt_probs'])).T, (np.array(model.training_stats['correctness'])).T
+    model.training_stats['train_losses'], model.training_stats['val_losses'] = np.array(model.training_stats['train_losses']), np.array(model.training_stats['val_losses'])
 
     return model
 
