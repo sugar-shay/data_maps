@@ -126,7 +126,7 @@ def main():
         model.load_state_dict(torch.load('bert_test.pt'))
     else:
         model = torch.nn.DataParallel(model)
-        model.load_state_dict(torch.load('bert_test.pt'))
+        model.load_state_dict(torch.load('bert_test.pt', map_location='cuda:0'))
     
     cr = model_testing(model, test_data)
     
