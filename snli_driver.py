@@ -19,7 +19,7 @@ from lit_snli import *
 
 def main():
     
-    train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:3000]', 'validation','test'])
+    train_ds, val_ds, test_ds = load_dataset('snli', split=['train[:5500]', 'validation','test'])
     
     train_labels = train_ds['label']
     val_labels = val_ds['label']
@@ -86,13 +86,14 @@ def main():
     
     model = LIT_SNLI(num_classes = 3, hidden_dropout_prob=.1, attention_probs_dropout_prob=.1, encoder_name=encoder_name, save_fp = 'bert_test.pt')
     
+    '''
     cr = model_testing(model, test_data)
     
     with open('sanity_check_cr.pkl', 'wb') as f:
         pickle.dump(cr, f)
     
     '''
-    model = train_LitModel(model, train_data, val_data, max_epochs=15, batch_size=4, patience = 3, num_gpu=1)
+    model = train_LitModel(model, train_data, val_data, max_epochs=15, batch_size=4, patience = 3, num_gpu=4)
     
     
     
@@ -119,11 +120,9 @@ def main():
     
     cr = model_testing(model, test_data)
     
-    with open('bert_test/bert_test_stats.pkl', 'wb') as f:
+    with open('bert_test/bert_test_run.pkl', 'wb') as f:
         pickle.dump(cr, f)
     
-    
-    '''
-    
+
 if __name__ == "__main__":
     main()

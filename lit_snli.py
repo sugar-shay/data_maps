@@ -33,9 +33,12 @@ class LIT_SNLI(pl.LightningModule):
         
         self.build_model(hidden_dropout_prob, attention_probs_dropout_prob, encoder_name)
         
-        self.train_losses, self.val_losses = [], []
-        self.train_accs, self.val_accs = [], []
-        self.gt_probs, self.correctness = [], []
+        self.training_stats = {'train_losses':[],
+                               'val_losses':[],
+                               'train_accs':[],
+                               'val_accs':[],
+                               'gt_probs':[],
+                               'correctness':[]}
         
         self.save_fp = save_fp
     
@@ -99,22 +102,22 @@ class LIT_SNLI(pl.LightningModule):
     def training_epoch_end(self, outputs):
         # Outputs --> List of Individual Step Outputs
         avg_loss = torch.stack([x["train_loss"] for x in outputs]).mean()
-        self.train_losses.append(avg_loss.detach().cpu())
+        self.training_stats['train_losses'].append(avg_loss.detach().cpu())
         
         #could do 
         #self.train_losses.append((avg_loss.detach().cpu()), self.current_epoch)
         
         avg_acc = np.stack([x["train_acc"] for x in outputs]).mean()
-        self.train_accs.append(avg_acc)
+        self.training_stats['train_accs'].append(avg_acc)
         
         #both of these have shape [# examples]
         gt_probs = torch.cat([x['ground_truth_probs'] for x in outputs])
         correctness = torch.cat([x['correct_mask'] for x in outputs])
         
-        self.gt_probs.append(gt_probs.detach().cpu().numpy())
-        self.correctness.append(correctness.detach().cpu().numpy())
+        self.training_stats['gt_probs'].append(gt_probs.detach().cpu().numpy())
+        self.training_stats['correctness'].append(correctness.detach().cpu().numpy())
         
-        #print('Train Loss: ', avg_loss)
+        self.log('train_loss', avg_loss)
         
     def validation_step(self, batch, batch_idx):
 
@@ -138,17 +141,16 @@ class LIT_SNLI(pl.LightningModule):
         avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
         
         avg_loss_cpu = avg_loss.detach().cpu().numpy()
-        if len(self.val_losses) == 0 or avg_loss_cpu<np.min(self.val_losses):
+        if len(self.training_stats['val_losses']) == 0 or avg_loss_cpu<np.min(self.training_stats['val_losses']):
             self.save_model()
             
-        self.val_losses.append(avg_loss_cpu)
+        self.training_stats['val_losses'].append(avg_loss_cpu)
         
         avg_acc =  np.stack([x["val_acc"] for x in outputs]).mean()
-        self.val_accs.append(avg_acc)
+        self.training_stats['val_accs'].append(avg_acc)
         
-        #self.log('val_loss', avg_loss, self.current_epoch)
-        
-        #print('Val Loss: ', avg_loss)
+        self.log('val_loss', avg_loss)
+        self.log('val_acc', avg_acc)
         
         
 
@@ -159,9 +161,9 @@ def train_LitModel(model, train_data, val_data, max_epochs, batch_size, patience
     train_dataloader = DataLoader(train_data, batch_size = batch_size, shuffle=False)#, num_workers=8)#, num_workers=16)
     val_dataloader = DataLoader(val_data, batch_size=32, shuffle = False)
     
-    #early_stop_callback = EarlyStopping(monitor="val_loss", patience=patience, verbose=False, mode="min")
+    early_stop_callback = EarlyStopping(monitor="val_loss", patience=patience, verbose=False, mode="min")
     
-    trainer = pl.Trainer(gpus=num_gpu, max_epochs = max_epochs)
+    trainer = pl.Trainer(gpus=num_gpu, max_epochs = max_epochs, callbacks = [early_stop_callback])
     trainer.fit(model, train_dataloader, val_dataloader)
     
     model.gt_probs, model.correctness = (np.array(model.gt_probs)).T, (np.array(model.correctness)).T
