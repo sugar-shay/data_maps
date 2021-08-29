@@ -167,10 +167,10 @@ def train_LitModel(model, train_data, val_data, max_epochs, batch_size, patience
     trainer.fit(model, train_dataloader, val_dataloader)
     
     print('Train Stats: ', model.training_stats)
-    '''
+    
     model.training_stats['gt_probs'], model.training_stats['correctness'] = (np.array(model.training_stats['gt_probs'])).T, (np.array(model.training_stats['correctness'])).T
     model.training_stats['train_losses'], model.training_stats['val_losses'] = np.array(model.training_stats['train_losses']), np.array(model.training_stats['val_losses'])
-    '''
+    
     return model
 
 

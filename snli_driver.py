@@ -93,7 +93,7 @@ def main():
         pickle.dump(cr, f)
     
     '''
-    model = train_LitModel(model, train_data, val_data, max_epochs=15, batch_size=4, patience = 3, num_gpu=4)
+    model = train_LitModel(model, train_data, val_data, max_epochs=15, batch_size=4, patience = 3, num_gpu=1)
     
     
     
