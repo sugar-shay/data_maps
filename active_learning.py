@@ -177,7 +177,7 @@ if __name__=="__main__":
         print('RUN #:',run+1)
         print('##############')
         
-        stats = main(cluster_eval=True, cluster_type='easy', save_dir=save_dir)
+        stats = main(cluster_eval=True, cluster_type='ambig', save_dir=save_dir)
         accs.append(stats['accs'])
         f1.append(stats['macro_f1'])
         prec.append(stats['macro_prec'])
@@ -194,5 +194,5 @@ if __name__=="__main__":
                              'macro_prec':avg_prec,
                              'macro_recall':avg_recall}
     
-    with open(save_dir+'/active_learning_easy_stats.pkl', 'wb') as f:
+    with open(save_dir+'/active_learning_ambig_stats.pkl', 'wb') as f:
             pickle.dump(avg_active_learning_stat, f)
